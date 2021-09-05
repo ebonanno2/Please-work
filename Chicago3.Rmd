@@ -26,7 +26,8 @@ library(ggplot2)
 
 ## Downloading and Naming Data
 ```{r downloading data}
-Ezones <- st_read("https://data.cityofchicago.org/api/geospatial/64xf-pyvh?method=export&format=KML", quietly = TRUE) 
+Ezones <- st_read("https://data.cityofchicago.org/api/geospatial/64xf-pyvh?method=export&format=KML") 
+
 Lstops <- st_read("https://data.cityofchicago.org/download/4qtv-9w43/application%2Fxml")
 ```
 
