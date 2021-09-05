@@ -15,16 +15,175 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+```{r load packages, message=FALSE}
+library(sf)
+library(tidyverse)
+library(ggthemes)
+library(ggspatial)
+library(dplyr)
+library(ggplot2)
+```
+
+## Downloading and Naming Data
+```{r downloading data}
+Ezones <- st_read("https://data.cityofchicago.org/api/geospatial/64xf-pyvh?method=export&format=KML", quietly = TRUE) 
+Lstops <- st_read("https://data.cityofchicago.org/download/4qtv-9w43/application%2Fxml")
 ```
 
 ## Including Plots
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+Lstops_plot <- ggplot(Lstops) +
+  geom_sf() 
+Lstops_plot
 ```
+```{r changing color and shape}
+ggplot(Lstops) +
+  geom_sf(shape = 17, color = "blue") 
+```
+```{r changing point size}
+ggplot(Lstops) +
+  geom_sf(shape = 18, color = "red", size = 0.5) 
+```
+```{r changing transparency}
+ggplot(Lstops) +
+  geom_sf(shape = 18, color = "red", alpha = 0.1) 
+```
+```{r}
+ggplot(Lstops) +
+  geom_sf() +
+  geom_sf(data = Ezones) 
+```
+```{r changing the layering order}
+ggplot() +
+  geom_sf(data = Ezones) +
+  geom_sf(data = Lstops, color = "red") 
+```
+```{r}
+ggplot() +
+  geom_sf(data = Ezones, color = "red",
+                        fill = "red",
+                        alpha = 0.5) +
+  geom_sf(data = Lstops, color = "blue", size = 0.5)
+```
+```{r creating a legend}
+ggplot() +
+  geom_sf(data = Ezones, color = NA,alpha = 0.5,
+                        aes(fill = "Enterprise Zones")) +
+  geom_sf(data = Lstops, color = "blue") +
+  scale_fill_manual(values = "red", name = "")
+```
+```{r making two legends}
+ggplot() +
+  geom_sf(data = Ezones, color = NA,alpha = 0.5,
+                        aes(fill = "Enterprise Zones")) +
+  geom_sf(data = Lstops,
+          size = 0.5,
+          aes(color = "CTA - L stops")) +
+  scale_fill_manual(values = "red", name = "") +
+  scale_color_manual(values = "blue", name = "")
+```
+```{r changing background color}
+ggplot() +
+  geom_sf(data = Ezones, color = NA,alpha = 0.5,
+                        aes(fill = "Enterprise Zones")) +
+  geom_sf(data = Lstops,
+          size = 0.5,
+          aes(color = "CTA - L stops")) +
+  scale_fill_manual(values = "red", name = "") +
+  scale_color_manual(values = "blue", name = "") +
+  theme(panel.background = element_rect(fill = "white"),
+        legend.key = element_rect(fill = "white"))
+```
+```{r same thing but easier}
+ggplot() +
+  geom_sf(data = Ezones, color = NA,alpha = 0.5,
+                        aes(fill = "Enterprise Zones")) +
+  geom_sf(data = Lstops,
+          size = 0.5,
+          aes(color = "CTA - L stops")) +
+  scale_fill_manual(values = "red", name = "") +
+  scale_color_manual(values = "blue", name = "") +
+  theme_void()
+```
+```{r}
+ggplot() +
+  geom_sf(data = Ezones, color = NA,alpha = 0.5,
+                        aes(fill = "Enterprise Zones")) +
+  geom_sf(data = Lstops,
+          size = 0.5,
+          aes(color = "CTA - L stops")) +
+  scale_fill_manual(values = "red", name = "") +
+  scale_color_manual(values = "blue", name = "") +
+  theme_map()
+```
+```{r}
+ggplot(Lstops) + 
+  annotation_map_tile(zoomin = 0, progress = "none") +
+  geom_sf()+
+  labs(caption = "Map tiles and data by OpenStreetMap")
+```
+```{r}
+ggplot(Lstops) + 
+  geom_sf() +
+  geom_sf(data = Ezones) +
+  annotation_map_tile(zoomin = 0, progress = "none", type = "stamenbw") +
+  geom_sf()+
+  labs(caption = "Map tiles and data by OpenStreetMap")
+```
+```{r plotting data on top of a basemap}
+ggplot() +
+  annotation_map_tile(zoomin = 0, progress = "none", type = "cartolight")  +
+  geom_sf() +
+  labs(caption = "Map tiles and data by OpenStreetMap")+
+  geom_sf(data = Ezones, color = "red",
+                        fill = "red",
+                        alpha = 0.5) +
+  geom_sf(data = Lstops, color = "blue", size = 0.5) 
+  
+```
+```{r plotting on top of a basemap with a legend}
+ggplot() +
+  annotation_map_tile(zoomin = 0, progress = "none", type = "cartolight")  +
+  geom_sf() +
+  labs(caption = "Map tiles and data by OpenStreetMap")+
+  geom_sf(data = Ezones, color = NA,alpha = 0.5,
+                        aes(fill = "Enterprise Zones")) +
+  geom_sf(data = Lstops,
+          size = 0.5,
+          aes(color = "CTA - L stops")) +
+  scale_fill_manual(values = "red", name = "") +
+  scale_color_manual(values = "blue", name = "") +
+  theme_void()
+```
+```{r}
+ggplot() +
+  annotation_map_tile(zoomin = 0, progress = "none", type = "cartolight")  +
+  geom_sf() +
+  labs(caption = "Map tiles and data by OpenStreetMap")+
+  geom_sf(data = Ezones, color = "red",alpha = 0.2,
+                        aes(fill = "Enterprise Zones")) +
+  geom_sf(data = Lstops,
+          size = 0.5,
+          aes(color = "CTA - L stops")) +
+  scale_fill_manual(values = "red", name = "") +
+  scale_color_manual(values = "blue", name = "") +
+  theme_void()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
